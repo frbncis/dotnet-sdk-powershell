@@ -1,10 +1,11 @@
 # NOTE: .NET Core SDK and node.js images are originally built from buildpack-deps:jessie
 FROM microsoft/dotnet:2.1-sdk AS build
 
-# Install PowerShell
+# Install PowerShell and xz-utils. xz-utils is for node.js extraction 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         apt-transport-https \
+        xz-utils \
     && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
     && sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-debian-stretch-prod stretch main" > /etc/apt/sources.list.d/microsoft.list' \
     && apt-get update \
@@ -14,8 +15,7 @@ RUN apt-get update \
 
 RUN ln -s /usr/bin/pwsh /usr/bin/powershell
 # End of PowerShell installation
-
-
+  
 # Install node.js
 RUN groupadd --gid 1000 node \
   && useradd --uid 1000 --gid node --shell /bin/bash --create-home node
@@ -76,5 +76,6 @@ RUN set -ex \
   && ln -s /opt/yarn-v$YARN_VERSION/bin/yarn /usr/local/bin/yarn \
   && ln -s /opt/yarn-v$YARN_VERSION/bin/yarnpkg /usr/local/bin/yarnpkg \
   && rm yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz
+
   
   # End of node.js installation
